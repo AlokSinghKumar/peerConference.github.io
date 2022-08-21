@@ -46,7 +46,13 @@ let init = async () => {
 
     client.on ("MessageFromPeer", handleMessageFromPeer);
 
-    localStream = await navigator.mediaDevices.getUserMedia (constraints);
+    localStream = await navigator.mediaDevices.getUserMedia ({
+        video : {
+            width : { min : 620, ideal : 1920, max : 1920},
+            height : {min : 480, ideal : 1080, max : 1080},
+        },
+        audio : true
+    });
     document.getElementById ("user-1").srcObject = localStream;
 }
 
@@ -93,7 +99,13 @@ let createPeerConnection = async (MemberId) => {
     document.getElementById ("user-1").classList.add ("smallFrame");
 
     if(!localStream){
-        localStream = await navigator.mediaDevices.getUserMedia(constraints)
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video : {
+                width : { min : 620, ideal : 1920, max : 1920},
+                height : {min : 480, ideal : 1080, max : 1080},
+            },
+            audio : true
+        })
         document.getElementById('user-1').srcObject = localStream
     }
 
