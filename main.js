@@ -1,12 +1,4 @@
 let APP_ID = "9cb2fa92d2e044ec8bcd32ddbb432ea3";
-let constraints = {
-    video : {
-        width : { min : 620, ideal : 1920, max : 1920},
-        height : {min : 480, ideal : 1080, max : 1080},
-    },
-    audio : true,
-}
-
 
 let token = null;
 let uid = String (Math.floor (Math.random () * 10000))
@@ -33,6 +25,16 @@ const servers = {
     ]
 }
 
+let constraints = {
+    video : {
+        width : { min : 620, ideal : 1920, max : 1920},
+        height : {min : 480, ideal : 1080, max : 1080},
+    },
+    audio : true,
+}
+
+
+
 
 let init = async () => {
     client = await AgoraRTM.createInstance (APP_ID);
@@ -46,13 +48,7 @@ let init = async () => {
 
     client.on ("MessageFromPeer", handleMessageFromPeer);
 
-    localStream = await navigator.mediaDevices.getUserMedia ({
-        video : {
-            width : { min : 620, ideal : 1920, max : 1920},
-            height : {min : 480, ideal : 1080, max : 1080},
-        },
-        audio : true
-    });
+    localStream = await navigator.mediaDevices.getUserMedia (constraints);
     document.getElementById ("user-1").srcObject = localStream;
 }
 
@@ -67,18 +63,18 @@ let handleMessageFromPeer = async (message, MemberId) => {
 
     if(message.type === 'offer'){
         console.info ("GOT Offer", message.offer);
-        createAnswer(MemberId, message.offer)
+        await createAnswer(MemberId, message.offer)
     }
 
     if(message.type === 'answer'){
         console.info ("GOT Answer", message.answer);
-        addAnswer(message.answer)
+        await addAnswer(message.answer)
     }
 
     if(message.type === 'candidate'){
         console.info ("GOT ICE Candidate", message.candidate);
         if(peerConnection){
-            peerConnection.addIceCandidate(message.candidate)
+            await peerConnection.addIceCandidate(message.candidate)
         }
     }
 
@@ -99,13 +95,7 @@ let createPeerConnection = async (MemberId) => {
     document.getElementById ("user-1").classList.add ("smallFrame");
 
     if(!localStream){
-        localStream = await navigator.mediaDevices.getUserMedia({
-            video : {
-                width : { min : 620, ideal : 1920, max : 1920},
-                height : {min : 480, ideal : 1080, max : 1080},
-            },
-            audio : true
-        })
+        localStream = await navigator.mediaDevices.getUserMedia(constraints)
         document.getElementById('user-1').srcObject = localStream
     }
 
